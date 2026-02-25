@@ -63,6 +63,11 @@
             letter-spacing: 2px;
             margin-bottom: 25px;
             text-transform: uppercase;
+            /* เพิ่มความสูงให้คงที่ ป้องกันกล่องขยับตอนสลับตัวอักษร */
+            min-height: 60px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         /* ✨ กล่องข้อความแนะนำตัวแบบใหม่ ✨ */
@@ -123,8 +128,8 @@
             padding: 10px 25px;
             border: 1px solid #ffffff;
             border-radius: 30px;
-            font-size: 1.1rem; /* ปรับขนาดฟอนต์ปุ่มให้ใหญ่ขึ้นนิดนึงค่ะ */
-            cursor: pointer; /* ทำให้เป็นรูปมือชี้ตอนเอาเมาส์ไปวาง */
+            font-size: 1.1rem; 
+            cursor: pointer; 
             transition: all 0.3s ease;
             text-decoration: none;
             color: #ffffff;
@@ -154,7 +159,7 @@
 
     <div class="container">
         <div class="profile-pic">⚡</div>
-        <h1>Zemon Źx</h1>
+        <h1 id="glitch-title">Zemon Źx</h1>
         
         <div class="intro-box">
             <ul class="personal-info">
@@ -182,6 +187,44 @@
             © 2026 Talkative Galaxy By Zemon
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleElement = document.getElementById('glitch-title');
+            const originalText = 'Zemon Źx';
+            // ชุดตัวอักษรที่จะสุ่มมาแสดงตอนวิ่งมั่วๆ ค่ะ
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZŹ0123456789!@#$%^&*';
+            
+            function scrambleText() {
+                let iteration = 0;
+                const maxIterations = 40; // 40 รอบ รอบละ 50ms = วิ่งมั่วๆ รวม 2 วินาทีพอดีค่ะ
+                
+                const interval = setInterval(() => {
+                    titleElement.innerText = originalText.split('').map((char) => {
+                        // ถ้าเป็นช่องว่างให้เว้นไว้ ไม่ต้องสุ่ม
+                        if(char === ' ') return ' '; 
+                        // สุ่มตัวอักษรมาใส่แทน
+                        return letters[Math.floor(Math.random() * letters.length)];
+                    }).join('');
+                    
+                    iteration++;
+                    
+                    // เมื่อครบ 2 วินาทีแล้ว ให้หยุดสุ่มและแสดงชื่อที่ถูกต้อง
+                    if (iteration >= maxIterations) {
+                        clearInterval(interval);
+                        titleElement.innerText = originalText;
+                    }
+                }, 50);
+            }
+
+            // เริ่มทำงาน: รอ 3 วินาทีแรก แล้วเริ่มแสดงเอฟเฟกต์
+            setTimeout(() => {
+                scrambleText();
+                // หลังจากนั้นตั้งเวลาให้ทำงานวนลูปทุกๆ 5 วินาที (สลับ 2 วิ + รอ 3 วิ = 5 วิ)
+                setInterval(scrambleText, 5000);
+            }, 3000);
+        });
+    </script>
 
 </body>
 </html>
