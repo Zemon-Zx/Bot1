@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simon - Zemon Źx | Portfolio</title>
+    <title>Zemon - Zemon Źx | Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* สไตล์โทน ดำ-ขาว มินิมอล */
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap');
@@ -84,6 +85,7 @@
             gap: 15px;
         }
 
+        /* ปายปรับแต่ง .tag นิดหน่อยให้รองรับไอคอนและปุ่มลิงก์ค่ะ */
         .tag {
             padding: 8px 20px;
             border: 1px solid #ffffff;
@@ -91,6 +93,15 @@
             font-size: 0.9rem;
             cursor: default;
             transition: all 0.3s ease;
+            text-decoration: none;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        a.tag {
+            cursor: pointer;
         }
 
         .tag:hover {
@@ -119,11 +130,13 @@
             <div class="tag">Roblox Scripts</div>
             <div class="tag">UI Library</div>
             <div class="tag">Web Development</div>
-            <div class="tag">Discord Bots</div>
+            <a href="https://discord.gg/xCQeCj2ke" target="_blank" class="tag">
+                <i class="fa-brands fa-discord"></i> Discord Server
+            </a>
         </div>
 
         <div class="footer">
-            © 2026 Talkative Galaxy By Simon
+            © 2026 Talkative Galaxy By Zemon
         </div>
     </div>
 
