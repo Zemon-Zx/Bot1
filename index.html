@@ -23,17 +23,18 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            padding: 20px;
         }
 
         .container {
             text-align: center;
-            padding: 50px;
+            padding: 40px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
             max-width: 600px;
+            width: 100%;
             backdrop-filter: blur(10px);
             transition: transform 0.3s ease;
         }
@@ -60,22 +61,62 @@
             font-size: 2.5rem;
             font-weight: 600;
             letter-spacing: 2px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             text-transform: uppercase;
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 300;
             color: #aaaaaa;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
         }
 
-        p {
-            font-size: 1rem;
+        /* ✨ กล่องข้อความแนะนำตัวแบบใหม่ ✨ */
+        .intro-box {
+            background-color: #000000; /* พื้นหลังสีดำสนิท */
+            border: 2px solid #ffffff; /* ขอบสีขาว */
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            /* อนิเมชั่นขอบกระพริบ */
+            animation: border-blink 1.5s infinite alternate; 
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes border-blink {
+            0% {
+                border-color: rgba(255, 255, 255, 1);
+                box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            }
+            100% {
+                border-color: rgba(255, 255, 255, 0.3);
+                box-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .personal-info {
+            list-style: none;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            line-height: 1.8;
+            color: #ffffff;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #555, transparent);
+            margin: 15px 0;
+        }
+
+        .invite-message {
+            font-size: 0.95rem;
+            color: #dddddd;
             line-height: 1.6;
-            color: #cccccc;
-            margin-bottom: 40px;
+            margin-top: 10px;
         }
 
         .tags {
@@ -83,11 +124,11 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
+            margin-top: 20px;
         }
 
-        /* ปายปรับแต่ง .tag นิดหน่อยให้รองรับไอคอนและปุ่มลิงก์ค่ะ */
         .tag {
-            padding: 8px 20px;
+            padding: 10px 25px;
             border: 1px solid #ffffff;
             border-radius: 30px;
             font-size: 0.9rem;
@@ -98,16 +139,20 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            background: rgba(0,0,0,0.3);
         }
 
+        /* ปุ่ม Discord เด่นๆ */
         a.tag {
             cursor: pointer;
+            font-weight: 600;
         }
 
         .tag:hover {
             background-color: #ffffff;
             color: #0a0a0a;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
         }
 
         .footer {
@@ -124,12 +169,28 @@
         <div class="profile-pic">⚡</div>
         <h1>Zemon Źx</h1>
         <h2>Roblox Script Developer & Web Designer</h2>
-        <p>สวัสดีครับ ผมซีม่อน ผู้เชี่ยวชาญด้านการเขียนสคริปต์โปร Roblox ออโต้ฟาร์ม, พัฒนา UI Library สุดล้ำ และรับทำเว็บไซต์ขายไอดีเกมแบบครบวงจร พร้อมระบบที่ใช้งานง่ายและเสถียรที่สุด</p>
+        
+        <div class="intro-box">
+            <ul class="personal-info">
+                <li>👤 ชื่อ : ซีม่อน (Simon)</li>
+                <li>🎂 อายุ : 16 ปี</li>
+                <li>🌏 ลูกครึ่ง : ไทย - ฟิลิปปินส์ 🇹🇭 🇵🇭</li>
+            </ul>
+            
+            <div class="divider"></div>
+
+            <div class="invite-message">
+                <p>✨ ยินดีต้อนรับสู่คอมมูนิตี้ของเรา! เข้ามาพูดคุยหาเพื่อนเล่นเกม แลกเปลี่ยนความรู้ และสนุกไปด้วยกันได้ที่นี่เลยครับ</p>
+                <br>
+                <p>🌌 Welcome to our community! Join us to chat, make friends, share knowledge, and have fun together!</p>
+            </div>
+        </div>
         
         <div class="tags">
             <div class="tag">Roblox Scripts</div>
             <div class="tag">UI Library</div>
             <div class="tag">Web Development</div>
+            
             <a href="https://discord.gg/xCQeCj2ke" target="_blank" class="tag">
                 <i class="fa-brands fa-discord"></i> Discord Server
             </a>
