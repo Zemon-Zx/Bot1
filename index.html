@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon - Zemon Źx | Portfolio</title>
+    <style>
+        /* สไตล์โทน ดำ-ขาว มินิมอล */
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: #0a0a0a;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 300;
+            color: #aaaaaa;
+            margin-bottom: 30px;
+        }
+
+        p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #cccccc;
+            margin-bottom: 40px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .tag {
+            padding: 8px 20px;
+            border: 1px solid #ffffff;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: default;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background-color: #ffffff;
+            color: #0a0a0a;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            color: #555555;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="profile-pic">⚡</div>
+        <h1>Zemon Źx</h1>
+        <h2>Roblox Script Developer & Web Designer</h2>
+        <p>สวัสดีครับ ผมซีม่อน ผู้เชี่ยวชาญด้านการเขียนสคริปต์โปร Roblox ออโต้ฟาร์ม, พัฒนา UI Library สุดล้ำ และรับทำเว็บไซต์ขายไอดีเกมแบบครบวงจร พร้อมระบบที่ใช้งานง่ายและเสถียรที่สุด</p>
+        
+        <div class="tags">
+            <div class="tag">Roblox Scripts</div>
+            <div class="tag">UI Library</div>
+            <div class="tag">Web Development</div>
+            <div class="tag">Discord Bots</div>
+        </div>
+
+        <div class="footer">
+            © 2026 Talkative Galaxy By Simon
+        </div>
+    </div>
+
+</body>
+</html>
