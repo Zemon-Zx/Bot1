@@ -146,10 +146,11 @@ client.on('interactionCreate', async interaction => {
             const embed = new EmbedBuilder()
                 .setColor('#FF0055')
                 .setTitle('【 🧧 】 ซื้อยศอัตโนมัติ')
-                .setDescription(`📌 **วิธีซื้อยศ**\n\n1. กดปุ่ม **ซื้อยศ VIP** ด้านล่าง\n2. โอนเงินตามจำนวนที่กำหนด\n3. แนบสลิปและรอรับยศอัตโนมัติ!\n\n💳 **ราคายศ:** \`${price}\` บาท\n🎁 **ยศที่ได้รับ:** ${role}`)
+                .setDescription(`📌 **วิธีซื้อยศ**\n\n1. กดปุ่ม **ซื้อยศ VIP** เพื่อดูช่องทางชำระเงิน\n2. โอนเงินตามจำนวนที่กำหนด\n3. เมื่อโอนเสร็จแล้ว นำสลิปมากดส่งที่ปุ่ม **แนบสลิป**\n4. รอระบบตรวจสอบและรับยศอัตโนมัติ!\n\n💳 **ราคายศ:** \`${price}\` บาท\n🎁 **ยศที่ได้รับ:** ${role}`)
                 .setImage('https://media.discordapp.net/attachments/111/112/banner.png') // ซีม่อนเปลี่ยนลิงก์รูปแบนเนอร์ตรงนี้ได้เลยนะคะ
                 .setFooter({ text: '© ปรารถนาเดือด 18+' });
 
+            // 🌟 แก้ไข: ย้ายปุ่มแนบสลิปมาไว้ที่ Panel หลักรวมเป็น 3 ปุ่ม
             const buttons = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('buy_vip_process')
@@ -160,7 +161,12 @@ client.on('interactionCreate', async interaction => {
                     .setCustomId('check_vip_price')
                     .setLabel('ดูราคายศ')
                     .setEmoji('🏷️')
-                    .setStyle(ButtonStyle.Secondary)
+                    .setStyle(ButtonStyle.Secondary),
+                new ButtonBuilder()
+                    .setCustomId('attach_slip_now')
+                    .setLabel('แนบสลิป')
+                    .setEmoji('🧾')
+                    .setStyle(ButtonStyle.Success)
             );
 
             await interaction.reply({ content: '✅ ส่งหน้าต่างซื้อยศเรียบร้อยแล้วค่ะ!', ephemeral: true });
@@ -199,28 +205,22 @@ client.on('interactionCreate', async interaction => {
             await interaction.reply({ content: `🏷️ **ราคายศ VIP ปัจจุบันคือ:** \`${vipSetup.price}\` บาทค่ะ`, ephemeral: true });
         }
 
-        // --- 🌟 ปุ่มซื้อยศ VIP (แสดงเบอร์วอเลต) ---
+        // --- 🌟 ปุ่มซื้อยศ VIP (แสดงเบอร์วอเลตแบบไม่มีปุ่มแนบสลิปแล้ว) ---
         if (interaction.customId === 'buy_vip_process') {
             if (!vipSetup.roleId) return interaction.reply({ content: '❌ ระบบซื้อยศยังไม่ได้ตั้งค่าค่ะ ติดต่อแอดมินนะคะ', ephemeral: true });
 
             const embed = new EmbedBuilder()
                 .setColor('#00FF00')
                 .setTitle('🏦 ข้อมูลการชำระเงิน (TrueMoney Wallet)')
-                .setDescription(`กรุณาคัดลอกเบอร์ด้านล่างนี้ และทำการโอนเงินจำนวน **${vipSetup.price} บาท**\n\n📱 **เบอร์วอเลต:** \`${vipSetup.walletNumber}\`\n👤 **ชื่อบัญชี:** \`${vipSetup.walletName}\`\n\n⚠️ *เมื่อโอนเงินเสร็จแล้ว ให้กดปุ่ม **"แนบสลิป"** ด้านล่างนี้นะคะ*`);
+                .setDescription(`กรุณาคัดลอกเบอร์ด้านล่างนี้ และทำการโอนเงินจำนวน **${vipSetup.price} บาท**\n\n📱 **เบอร์วอเลต:** \`${vipSetup.walletNumber}\`\n👤 **ชื่อบัญชี:** \`${vipSetup.walletName}\`\n\n⚠️ *เมื่อโอนเงินเสร็จแล้ว ให้กลับไปกดปุ่ม **"แนบสลิป"** ที่หน้าแผงหลักนะคะ*`);
 
-            const btn = new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setCustomId('attach_slip_now')
-                    .setLabel('แนบสลิป (คลิกหลังโอนเสร็จ)')
-                    .setEmoji('🧾')
-                    .setStyle(ButtonStyle.Success)
-            );
-
-            await interaction.reply({ embeds: [embed], components: [btn], ephemeral: true });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         // --- 🌟 ปุ่มแนบสลิป (เปิดระบบรอรับรูปภาพ) ---
         if (interaction.customId === 'attach_slip_now') {
+            if (!vipSetup.roleId) return interaction.reply({ content: '❌ ระบบซื้อยศยังไม่ได้ตั้งค่าค่ะ ติดต่อแอดมินนะคะ', ephemeral: true });
+
             await interaction.reply({ content: '⏳ **กรุณาส่ง "รูปสลิปการโอนเงิน" ของคุณลงในช่องแชทนี้ภายใน 1 นาทีค่ะ**\n*(บอทจะลบรูปของคุณอัตโนมัติเพื่อความปลอดภัย)*', ephemeral: true });
 
             // สร้างตัวดักจับข้อความที่มีรูปภาพ
@@ -236,7 +236,7 @@ client.on('interactionCreate', async interaction => {
                 // แจ้งว่ากำลังตรวจสอบ
                 const checkingMsg = await interaction.followUp({ content: '🔄 กำลังตรวจสอบสลิป กรุณารอสักครู่นะคะ...', ephemeral: true });
 
-                // จำลองการตรวจสอบสลิป 3 วินาที (ถ้ามี API ของจริง ให้เขียนโค้ดตรวจสอบตรงนี้ค่ะ)
+                // จำลองการตรวจสอบสลิป 3 วินาที
                 setTimeout(async () => {
                     const role = interaction.guild.roles.cache.get(vipSetup.roleId);
                     const logChannel = interaction.guild.channels.cache.get(vipSetup.logChannelId);
@@ -263,7 +263,7 @@ client.on('interactionCreate', async interaction => {
                             await checkingMsg.edit({ content: '❌ บอทไม่สามารถมอบยศให้ได้ค่ะ รบกวนแจ้งแอดมินนะคะ' });
                         }
                     }
-                }, 3000); // ดีเลย์ 3 วินาทีให้ดูเหมือนบอทกำลังตรวจสลิป
+                }, 3000); 
             });
 
             collector.on('end', collected => {
