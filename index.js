@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, GatewayIntentBits, Partials, REST, Routes, SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionsBitField } = require('discord.js');
 const express = require('express');
 const path = require('path');
+const fs = require('fs'); // 🌟 ปายเพิ่ม fs สำหรับเซฟข้อมูลกันบอทรีเซ็ตค่ะ
 
 // ==========================================
 // 🌌 ส่วนตั้งค่า Web Server สำหรับ Railway 24/7
@@ -27,31 +28,37 @@ const client = new Client({
     partials: [Partials.User, Partials.GuildMember]
 });
 
-// 🌟 ตัวแปรเก็บความจำ (รีเซ็ตเมื่อบอทรีสตาร์ท)
-let dotSetup = {
-    channelId: null,
-    roleId: null
-};
+// 🌟 ระบบ Database กันข้อมูลหายตอนบอทรีสตาร์ท
+const dbPath = path.join(__dirname, 'database.json');
 
-// 🌟 ตัวแปรเก็บความจำระบบซื้อยศ VIP
-let vipSetup = {
-    roleId: null,
-    logChannelId: null,
-    price: 0,
-    walletNumber: '',
-    walletName: ''
-};
+let dotSetup = { channelId: null, roleId: null };
+let vipSetup = { roleId: null, logChannelId: null, price: 0, walletNumber: '', walletName: '' };
+
+// โหลดข้อมูลเก่ามาใช้ถ้ามีไฟล์อยู่แล้ว
+if (fs.existsSync(dbPath)) {
+    try {
+        const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+        if (data.dotSetup) dotSetup = data.dotSetup;
+        if (data.vipSetup) vipSetup = data.vipSetup;
+        console.log('[System] 📂 โหลดข้อมูลการตั้งค่าเดิมเรียบร้อยแล้วค่ะ!');
+    } catch (err) {
+        console.error('[System] ❌ อ่านไฟล์ข้อมูลไม่ได้ค่ะ สร้างใหม่นะคะ');
+    }
+}
+
+// ฟังก์ชันเซฟข้อมูล
+function saveData() {
+    fs.writeFileSync(dbPath, JSON.stringify({ dotSetup, vipSetup }, null, 4));
+}
 
 // --- สร้างคำสั่งต่างๆ ---
 const commands = [
-    // 1. คำสั่งตั้งค่ารับยศปกติ
     new SlashCommandBuilder()
         .setName('setup_role')
         .setDescription('สร้างแผงข้อความสำหรับกดรับยศ (ล็อกไว้ให้ Owner ใช้ได้คนเดียว)')
         .addRoleOption(option => option.setName('role').setDescription('เลือกยศที่จะมอบให้').setRequired(true))
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
         
-    // 2. คำสั่งห้องพิมพ์จุด .
     new SlashCommandBuilder()
         .setName('setup_dot')
         .setDescription('ตั้งค่าห้องพิมพ์จุด . เพื่อรับยศ (ล็อกไว้ให้ Owner ใช้ได้คนเดียว)')
@@ -59,7 +66,6 @@ const commands = [
         .addRoleOption(option => option.setName('role').setDescription('เลือกยศ').setRequired(true))
         .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator),
 
-    // 🌟 3. คำสั่งใหม่! ระบบซื้อยศ VIP
     new SlashCommandBuilder()
         .setName('setup_vip')
         .setDescription('สร้างแผงระบบซื้อยศ VIP อัตโนมัติ (Owner Only)')
@@ -91,9 +97,7 @@ client.once('ready', async () => {
 // ==========================================
 client.on('interactionCreate', async interaction => {
     
-    // ==========================================
     // 💬 ระบบคำสั่ง Slash Commands
-    // ==========================================
     if (interaction.isChatInputCommand()) {
         
         // 🔒 เช็ค Owner
@@ -123,10 +127,12 @@ client.on('interactionCreate', async interaction => {
             const role = interaction.options.getRole('role');
             dotSetup.channelId = channel.id;
             dotSetup.roleId = role.id;
+            saveData(); // 🌟 เซฟลงไฟล์
+
             await interaction.reply({ content: `✅ ตั้งค่าสำเร็จ! พิมพ์ \`.\` ในห้อง ${channel} จะได้ยศ **${role.name}** ทันทีค่ะ`, ephemeral: true });
         }
 
-        // --- 🌟 คำสั่ง /setup_vip (ระบบซื้อยศใหม่) ---
+        // --- คำสั่ง /setup_vip (ระบบซื้อยศใหม่) ---
         if (interaction.commandName === 'setup_vip') {
             const role = interaction.options.getRole('role');
             const logChannel = interaction.options.getChannel('log_channel');
@@ -134,7 +140,7 @@ client.on('interactionCreate', async interaction => {
             const walletNumber = interaction.options.getString('wallet_number');
             const walletName = interaction.options.getString('wallet_name');
 
-            // บันทึกค่าลงระบบ
+            // บันทึกค่าลงระบบและเซฟไฟล์ 🌟
             vipSetup = {
                 roleId: role.id,
                 logChannelId: logChannel.id,
@@ -142,15 +148,15 @@ client.on('interactionCreate', async interaction => {
                 walletNumber: walletNumber,
                 walletName: walletName
             };
+            saveData(); 
 
             const embed = new EmbedBuilder()
                 .setColor('#FF0055')
                 .setTitle('【 🧧 】 ซื้อยศอัตโนมัติ')
                 .setDescription(`📌 **วิธีซื้อยศ**\n\n1. กดปุ่ม **ซื้อยศ VIP** เพื่อดูช่องทางชำระเงิน\n2. โอนเงินตามจำนวนที่กำหนด\n3. เมื่อโอนเสร็จแล้ว นำสลิปมากดส่งที่ปุ่ม **แนบสลิป**\n4. รอระบบตรวจสอบและรับยศอัตโนมัติ!\n\n💳 **ราคายศ:** \`${price}\` บาท\n🎁 **ยศที่ได้รับ:** ${role}`)
-                .setImage('https://media.discordapp.net/attachments/111/112/banner.png') // ซีม่อนเปลี่ยนลิงก์รูปแบนเนอร์ตรงนี้ได้เลยนะคะ
+                .setImage('https://media.discordapp.net/attachments/111/112/banner.png') 
                 .setFooter({ text: '© ปรารถนาเดือด 18+' });
 
-            // 🌟 แก้ไข: ย้ายปุ่มแนบสลิปมาไว้ที่ Panel หลักรวมเป็น 3 ปุ่ม
             const buttons = new ActionRowBuilder().addComponents(
                 new ButtonBuilder()
                     .setCustomId('buy_vip_process')
@@ -174,9 +180,7 @@ client.on('interactionCreate', async interaction => {
         }
     }
 
-    // ==========================================
     // 🔘 ระบบกดปุ่ม (Buttons)
-    // ==========================================
     if (interaction.isButton()) {
         
         // --- ปุ่มรับยศฟรีปกติ ---
@@ -205,7 +209,7 @@ client.on('interactionCreate', async interaction => {
             await interaction.reply({ content: `🏷️ **ราคายศ VIP ปัจจุบันคือ:** \`${vipSetup.price}\` บาทค่ะ`, ephemeral: true });
         }
 
-        // --- 🌟 ปุ่มซื้อยศ VIP (แสดงเบอร์วอเลตแบบไม่มีปุ่มแนบสลิปแล้ว) ---
+        // --- ปุ่มซื้อยศ VIP (แสดงเบอร์วอเลต) ---
         if (interaction.customId === 'buy_vip_process') {
             if (!vipSetup.roleId) return interaction.reply({ content: '❌ ระบบซื้อยศยังไม่ได้ตั้งค่าค่ะ ติดต่อแอดมินนะคะ', ephemeral: true });
 
@@ -223,14 +227,14 @@ client.on('interactionCreate', async interaction => {
 
             await interaction.reply({ content: '⏳ **กรุณาส่ง "รูปสลิปการโอนเงิน" ของคุณลงในช่องแชทนี้ภายใน 1 นาทีค่ะ**\n*(บอทจะลบรูปของคุณอัตโนมัติเพื่อความปลอดภัย)*', ephemeral: true });
 
-            // สร้างตัวดักจับข้อความที่มีรูปภาพ
+            // สร้างตัวดักจับข้อความที่มีรูปภาพ (รองรับทีละหลายคนพร้อมกันได้ ไม่บั๊กแน่นอน!)
             const filter = m => m.author.id === interaction.user.id && m.attachments.size > 0;
             const collector = interaction.channel.createMessageCollector({ filter, time: 60000, max: 1 });
 
             collector.on('collect', async m => {
                 const attachment = m.attachments.first();
                 
-                // ลบรูปสลิปทิ้งทันทีเพื่อไม่ให้คนอื่นเห็น
+                // ลบรูปสลิปทิ้งทันที
                 await m.delete().catch(() => {});
 
                 // แจ้งว่ากำลังตรวจสอบ
@@ -243,9 +247,11 @@ client.on('interactionCreate', async interaction => {
 
                     if (role) {
                         try {
-                            // มอบยศ
+                            // 🌟 แก้ไข: เปลียนข้อความเป็นตรวจสอบสำเร็จก่อน ค่อยมอบยศให้!
+                            await checkingMsg.edit({ content: `✅ **ตรวจสอบสำเร็จ!** ระบบกำลังมอบยศให้คุณค่ะ ขอบคุณที่สนับสนุนนะคะ 🎉` });
+                            
+                            // 🌟 มอบยศทีหลังสุด
                             await interaction.member.roles.add(role);
-                            await checkingMsg.edit({ content: `✅ **ตรวจสอบสำเร็จ!** คุณได้รับยศ ${role} เรียบร้อยแล้วค่ะ ขอบคุณที่สนับสนุนนะคะ 🎉` });
 
                             // ส่ง Log ไปห้องประวัติการซื้อ
                             if (logChannel) {
@@ -253,15 +259,17 @@ client.on('interactionCreate', async interaction => {
                                     .setColor('#00FF00')
                                     .setTitle('👑 ประวัติการซื้อยศ')
                                     .setDescription(`🏦 **[ธนาคาร]** 🏦\n\n👤 ผู้ใช้: <@${interaction.user.id}>\n💰 ราคา: \`${vipSetup.price}.00 บาท\`\n🎉 ได้รับยศ: ${role}`)
-                                    .setThumbnail(attachment.url) // เอารูปสลิปแปะโชว์ในห้อง log
+                                    .setThumbnail(attachment.url) 
                                     .setFooter({ text: '© ปรารถนาเดือด 18+' })
                                     .setTimestamp();
                                 
                                 await logChannel.send({ embeds: [logEmbed] });
                             }
                         } catch (err) {
-                            await checkingMsg.edit({ content: '❌ บอทไม่สามารถมอบยศให้ได้ค่ะ รบกวนแจ้งแอดมินนะคะ' });
+                            await checkingMsg.edit({ content: '❌ ตรวจสอบผ่านแล้ว แต่บอทไม่สามารถมอบยศให้ได้ค่ะ รบกวนแจ้งแอดมินนะคะ' });
                         }
+                    } else {
+                        await checkingMsg.edit({ content: '❌ ไม่พบยศในระบบค่ะ รบกวนแจ้งแอดมินนะคะ' });
                     }
                 }, 3000); 
             });
